@@ -5,20 +5,26 @@ import New from './pages/New'
 import Diary from './pages/Diary'
 import Notfound from './pages/Notfound'
 import Edit from './pages/Edit'
-import { useReducer, useRef } from 'react'
+import { createContext, useReducer, useRef } from 'react'
 
 const mockData = [
   {
     id: 1,
-    createdDate: new Date().getTime(),
+    createdDate: new Date('2024-09-03').getTime(),
     emotionId: 1,
-    content: "1번 일기 내용"
+    content: '1번 일기 내용'
   },
   {
     id: 2,
-    createdDate: new Date().getTime(),
+    createdDate: new Date('2024-09-02').getTime(),
     emotionId: 2,
-    content: "2번 일기 내용"
+    content: '2번 일기 내용'
+  },
+  {
+    id: 3,
+    createdDate: new Date('2024-08-09').getTime(),
+    emotionId: 3,
+    content: '3번 일기 내용'
   }
 ];
 
@@ -34,6 +40,9 @@ function reducer(state, action){
       return state;
   }
 }
+
+export const DiaryStateContext = createContext();
+export const DiaryDispatchContext = createContext();
 
 function App() {
   const [data, dispatch] = useReducer(reducer, mockData);
@@ -72,17 +81,22 @@ function App() {
   }
 
   return (
-    <>    
-    <button onClick={() => onCreate(new Date().getTime(), 1, "아무거나")}>일기 추가 TEST</button>
-    <button onClick={() => onUpdate(1, new Date().getTime(), 3, "수정된 일기입니다.")}>일기 수정 TEST</button>
-    <button onClick={() => onDelete(1)}>일기 삭제 TEST</button>
-    <Routes>
-      <Route path='/' element={<Home />} />
-      <Route path='/new' element={<New />} />
-      <Route path='/diary/:id' element={<Diary />} />
-      <Route path='/edit/:id' element={<Edit />} />
-      <Route path='*' element={<Notfound />} />
-    </Routes>
+    <>
+    <DiaryStateContext.Provider value={data}>
+      <DiaryDispatchContext.Provider value={{
+        onCreate,
+        onUpdate,
+        onDelete
+      }}>
+        <Routes>
+          <Route path='/' element={<Home />} />
+          <Route path='/new' element={<New />} />
+          <Route path='/diary/:id' element={<Diary />} />
+          <Route path='/edit/:id' element={<Edit />} />
+          <Route path='*' element={<Notfound />} />
+        </Routes>
+      </DiaryDispatchContext.Provider>
+    </DiaryStateContext.Provider>
     </>
   )
 }
